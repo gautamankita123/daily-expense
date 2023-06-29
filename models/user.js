@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+
 const sequelize = require('../util/database');
 
 const User = sequelize.define('user', {
@@ -21,6 +22,6 @@ const User = sequelize.define('user', {
         allowNull: false
     },
     isPremium: Sequelize.BOOLEAN
-});
+})
 
 module.exports = User;

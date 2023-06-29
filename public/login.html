@@ -66,8 +66,11 @@
                 try {
                     const response = await axios.post('http://localhost:3000/user/login', { "email": loginEmail.value, "password": loginPassword.value });
                     localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('name', response.data.username);
+                    localStorage.setItem('isPremium', response.data.isPremium);
                     window.location.href = 'http://localhost:3000/index.html';
                 } catch (error) {
+                    console.log(error);
                     if (error.response.status == 404) {
                         alert(error.response.data.error + ". Please signup and try again");
                         window.location.href = 'http://localhost:3000/signup.html';

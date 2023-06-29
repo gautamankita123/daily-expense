@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+
 const sequelize = require('../util/database');
 
 const Expenses = sequelize.define('expense', {
@@ -6,6 +7,7 @@ const Expenses = sequelize.define('expense', {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        unique: true,
         allowNull: false
     },
     amount: {
@@ -20,6 +22,7 @@ const Expenses = sequelize.define('expense', {
         type: Sequelize.STRING,
         allowNull: false
     }
-});
+})
+
 
 module.exports = Expenses;

@@ -1,40 +1,49 @@
-const signupForm = document.querySelector('#signup-form');
+const signup = document.querySelector('.signup');
+const name = document.querySelector('#name');
+const email = document.querySelector('#email');
+const password = document.querySelector('#password');
+const confirmPassword = document.querySelector('#confirm-password');
 
-signupForm.addEventListener('submit', userSignup);
+signup.addEventListener('click', userSignup);
+email.addEventListener('keydown', validateEmail);
+
+
 
 async function userSignup(e) {
     e.preventDefault();
-    const name = document.querySelector('#name').value;
-    const email = document.querySelector('#email').value;
-    const password = document.querySelector('#password').value;
-    const confirmPassword = document.querySelector('#confirm-password').value;
-
-    if (matchPassword(password, confirmPassword)) {
+    if (matchPassword(password.value, confirmPassword.value)) {
         try {
-            if (name && email && password) {
-                const response = await axios.post('http://localhost:3000/user/signup', {
-                    name: name,
-                    email: email,
-                    password: password
-                });
+            if (name.value && email.value && password.value) {
+                const response = await axios.post('http://localhost:3000/user/signup', { "name": name.value, "email": email.value, "password": password.value });
                 console.log(response.data);
-                if (response.status === 201) {
-                    alert('User signed up successfully');
-                    window.location.href = 'http://localhost:3000/login.html';
-                }
+                alert('User signed up successfully');
+                window.location.href = 'http://localhost:3000/login.html';
             } else {
                 alert('Please fill in all fields');
             }
         } catch (error) {
-            console.log(error);
-            alert('User Already Exists: ' + error.response.data);
+            alert('User Already Exists', error.response.data.error);
         }
     } else {
         alert('Passwords do not match');
     }
+
 }
 
 function matchPassword(password, confirmPassword) {
-    return password === confirmPassword;
+    if (password === confirmPassword) {
+        return true;
+    }
+    return false;
 }
 
+function validateEmail(event) {
+    var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (email.value.match(validRegex)) {
+        email.style.backgroundColor = 'white';
+        return true;
+    } else {
+        email.style.backgroundColor = '#FA7E7C';
+        return false;
+    }
+}

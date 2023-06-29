@@ -2,35 +2,42 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
+// exports.getUser = (req, res, next) => {
+//     res.json(req.user);
+// }
+
 exports.postAddUser = async (req, res, next) => {
     const { name, email, password } = req.body;
     try {
         const user = await User.findOne({ where: { email: email } });
         if (user) {
             return res.status(400).json({
-                error: 'User already exists'
+                error: 'User already exists',
+                user: user
             });
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = await User.create({
             name: name,
             email: email,
-            password: hashedPassword
+            password: hashedPassword,
+            isPremium: false
         });
         res.status(201).json({
-            message: 'User created successfully',
             user: newUser
         });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            error: 'Server error'
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            error: err
         });
     }
-};
+}
 
 exports.postLoginUser = async (req, res, next) => {
-    const { email, password } = req.body;
+    const email = req.body.email;
+    const password = req.body.password;
     try {
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -49,17 +56,18 @@ exports.postLoginUser = async (req, res, next) => {
                 id: user.id,
                 name: user.name
             },
-            'ZindagiNaMilegiDubara',
-            { expiresIn: '1h' }
+            'ZindagiNaMilegiDubara'
         );
         res.status(200).json({
-            message: 'Login successful',
-            token: token
+            message: "Login successful",
+            token: token,
+            username: user.name,
+            isPremium: user.isPremium
         });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            error: 'Server error'
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            error: err
         });
     }
-};
+}
