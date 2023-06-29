@@ -8,7 +8,7 @@ const purchaseRoutes = require('./routes/purchase');
 const premiumRoutes = require('./routes/premiumRoute');
 const sequelize = require('./util/database');
 const User = require('./models/user');
-const Expenses = require('./models/expenses');
+const Expenses = require('./models/expense');
 const Order = require('./models/order');
 
 const app = express()

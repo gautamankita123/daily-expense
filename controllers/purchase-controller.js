@@ -2,11 +2,10 @@ const Razorpay = require('razorpay');
 const Order = require('../models/order');
 const User = require('../models/user');
 
-
 exports.getPremiumMemberShip = async (req, res, next) => {
     const razorpay = new Razorpay({
-        key_id: 'rzp_test_QCDHrdzs9DRrOM',
-        key_secret: 'SkzaQuBkFJLtbV1mv2bI83tj'
+        key_id: 'rzp_test_juYOltsrCYTr7t',
+        key_secret: 'AhJ26nonZIOvnyIXSeZtz4eO'
     });
 
     razorpay.orders.create({
@@ -36,7 +35,6 @@ exports.getPremiumMemberShip = async (req, res, next) => {
 }
 
 exports.postUpdatetransactionStatus = (req, res, next) => {
-
     Order.update({
         paymentId: req.body.paymentId,
         status: req.body.status

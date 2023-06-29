@@ -8,7 +8,9 @@ const jwt = require('jsonwebtoken');
 // }
 
 exports.postAddUser = async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
     try {
         const user = await User.findOne({ where: { email: email } });
         if (user) {

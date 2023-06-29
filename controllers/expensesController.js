@@ -1,4 +1,4 @@
-const Expenses = require('../models/expenses');
+const Expenses = require('../models/expense');
 
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');

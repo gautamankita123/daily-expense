@@ -19,7 +19,7 @@ leaderboardBtn.addEventListener('click', updateLeaderboard);
 
 // Get All Expenses From Database
 async function getExpenses() {
-    if (localStorage.getItem('isPremium') === "true") {
+    if (localStorage.getItem('isPremium') == "true") {
         document.querySelector('.premium-text').style.display = 'block';
         buyBtn.style.display = 'none';
         document.querySelector('.leaderboard').classList.remove('d-none');
@@ -35,7 +35,7 @@ async function getExpenses() {
             const response = await axios.get(`http://localhost:3000/expenses`, { headers: { 'Authorization': token } });
             response.data.forEach(expense => {
                 generateHTML(expense.id, expense.amount, expense.description, expense.category);
-            });
+            })
         } catch (error) {
             console.log(error);
         }
@@ -61,7 +61,7 @@ async function addExpense(e) {
                 console.log(error);
             }
         } else {
-            if (expenseAmount.value && expenseInfo.value && expenseCategory.value) {
+            if (!id && expenseAmount.value && expenseInfo.value && expenseCategory.value) {
                 try {
                     const response = await axios.post("http://localhost:3000/expenses", obj, { headers: { 'Authorization': token } });
                     generateHTML(response.data.id, response.data.amount, response.data.description, response.data.category);
@@ -74,7 +74,7 @@ async function addExpense(e) {
             }
         }
     } else {
-        alert('Please login to add an expense');
+        alert('Please login to add expense');
         window.location.href = 'http://localhost:3000/login.html';
     }
 }
@@ -95,9 +95,6 @@ async function deleteExpense(e) {
         }
     }
 }
-
-
-
 
 // Edit Expense From Database
 async function editExpense(e) {
@@ -138,46 +135,37 @@ async function addBuyPremium(e) {
     const token = localStorage.getItem('token');
     if (token) {
         try {
-
-            const response = await axios.post("http://localhost:3000/purchase/premiummembership", {}, { headers: { 'Authorization': token } });
-            const options = {
+            const response = await axios.get("http://localhost:3000/purchase/premiummembership", { headers: { 'Authorization': token } });
+            var options = {
                 "key": response.data.key_id, // Enter the Key ID generated from the Dashboard
                 "name": "Acme Corp", //your business name
                 "description": "Test Transaction",
                 "order_id": response.data.order.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                 "handler": async function (response) {
-                    try {
-                        document.querySelector('.premium-text').style.display = 'block';
-                        buyBtn.style.display = 'none';
-                        localStorage.setItem('isPremium', true);
-                        document.querySelector('.leaderboard').classList.remove('d-none');
-                        await axios.post("http://localhost:3000/updatetransactionstatus", {
-                            orderId: options.order_id,
-                            paymentId: response.razorpay_payment_id,
-                            status: "success"
-                        }, { headers: { 'Authorization': token } });
-                    } catch (error) {
-                        console.log(error);
-                    }
+                    document.querySelector('.premium-text').style.display = 'block';
+                    buyBtn.style.display = 'none';
+                    localStorage.setItem('isPremium', true);
+                    document.querySelector('.leaderboard').classList.remove('d-none');
+                    await axios.post("http://localhost:3000/updatetransactionstatus", {
+                        orderId: options.order_id,
+                        paymentId: response.razorpay_payment_id,
+                        status: "success"
+                    }, { headers: { 'Authorization': token } });
                 }
-            };
+            }
             const razorpay = new Razorpay(options);
             razorpay.open();
             e.preventDefault();
-            razorpay.on('payment.failed', async (response) => {
-                try {
-                    await axios.post("http://localhost:3000/updatetransactionstatus", {
-                        orderId: options.order_id,
-                        paymentId: response.error.metadata.payment_id,
-                        status: "failed"
-                    }, { headers: { 'Authorization': token } });
-                    alert(response.error.description);
-                } catch (error) {
-                    console.log(error);
-                }
+            razorpay.on('payment.failed', (response) => {
+                axios.post("http://localhost:3000/updatetransactionstatus", {
+                    orderId: options.order_id,
+                    paymentId: response.error.metadata.payment_id,
+                    status: "failed"
+                }, { headers: { 'Authorization': token } });
+                alert(response.error.description);
             });
-        } catch (error) {
-            console.log(error);
+        } catch (e) {
+            console.log(e);
         }
     }
 }
