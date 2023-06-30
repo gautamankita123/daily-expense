@@ -1,5 +1,4 @@
 const Expenses = require('../models/expense');
-
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
@@ -35,6 +34,14 @@ exports.postAddExpense = (req, res, next) => {
         userId: req.user.id
     })
         .then(response => {
+            const updatedAmount = req.user.totalAmount + amount;
+            User.update({
+                totalAmount: updatedAmount
+            }, {
+                where: {
+                    id: req.user.id
+                }
+            })
             res.json(response)
         })
         .catch(err => console.log(err));

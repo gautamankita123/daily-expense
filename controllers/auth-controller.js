@@ -24,7 +24,6 @@ exports.postAddUser = async (req, res, next) => {
             name: name,
             email: email,
             password: hashedPassword,
-            isPremium: false
         });
         res.status(201).json({
             user: newUser
