@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Sib = require('sib-api-v3-sdk');
 
 
 // exports.getUser = (req, res, next) => {
@@ -67,6 +68,49 @@ exports.postLoginUser = async (req, res, next) => {
         });
     } catch (err) {
         console.log(err);
+        return res.status(500).json({
+            error: err
+        });
+    }
+}
+
+exports.postForgotPassword = async (req, res, next) => {
+    const email = req.body.email;
+    try {
+        const user = User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({
+                error: 'User does not exist'
+            });
+        }
+
+        const client = Sib.ApiClient.instance;
+        const apiKey = client.authentications['api-key'];
+        apiKey.apiKey = "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";
+
+        const transEmailApi = new Sib.TransactionalEmailsApi();
+
+        const sender = {
+            email: 'ankitsharma751997@gmail.com'
+        }
+
+        const receivers = [
+            {
+                email: 'ankitsharma76543@gmail.com'
+            }
+        ]
+        const emailResponse = await transEmailApi.sendTransacEmail({
+            sender: sender,
+            to: receivers,
+            subject: 'Reset Password',
+            textContent: 'Please click the link below to reset your password'
+        });
+        // res.status(200).json({
+        //     message: "Password reset successful",
+        //     token: token
+        // });
+        console.log(emailResponse);
+    } catch (err) {
         return res.status(500).json({
             error: err
         });
