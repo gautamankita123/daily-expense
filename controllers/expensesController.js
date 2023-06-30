@@ -1,76 +1,89 @@
 const Expenses = require('../models/expense');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const sequelize = require('../util/database');
+const { catchBlock, sendResBlock } = require('../util/helper');
 
-exports.getAllExpenses = (req, res, next) => {
-    Expenses.findAll({
-        where: {
-            userId: req.user.id
-        }
-    })
-        .then(response => res.json(response))
-        .catch(err => console.log(err));
-}
-
-exports.getOneExpense = (req, res, next) => {
-    Expenses.findOne({
-        where: {
-            id: req.params.id,
-            userId: req.user.id
-        }
-    })
-        .then(response => res.json(response))
-        .catch(err => console.log(err));
-}
-
-exports.postAddExpense = (req, res, next) => {
-    const amount = parseInt(req.body.amount);
-    const description = req.body.description;
-    const category = req.body.category;
-    Expenses.create({
-        amount: amount,
-        description: description,
-        category: category,
-        userId: req.user.id
-    })
-        .then(response => {
-            const updatedAmount = req.user.totalAmount + amount;
-            User.update({
-                totalAmount: updatedAmount
-            }, {
-                where: {
-                    id: req.user.id
-                }
-            })
-            res.json(response)
-        })
-        .catch(err => console.log(err));
-}
-
-exports.putUpdateExpense = (req, res, next) => {
-    const expenseId = req.params.id;
-    Expenses.update({
-        amount: parseInt(req.body.amount),
-        description: req.body.description,
-        category: req.body.category
-    }, {
-        where: {
-            id: expenseId,
-            userId: req.user.id
-        }
+exports.getAllExpenses = async (req, res, next) => {
+    try {
+        const response = await Expenses.findAll({ where: { userId: req.user.id } });
+        sendResBlock(res, response)
+    } catch (err) {
+        catchBlock(res, err, 'Expense could not be retrieved');
     }
-    )
-        .then(response => res.json(response))
-        .catch(err => console.log(err));
 }
 
-exports.deleteExpense = (req, res, next) => {
-    Expenses.destroy({
-        where: {
-            id: req.params.id,
+exports.getOneExpense = async (req, res, next) => {
+    try {
+        const response = await Expenses.findOne({ where: { id: req.params.id, userId: req.user.id } });
+        sendResBlock(res, response);
+    } catch (err) {
+        catchBlock(res, err, 'Expense could not be retrieved');
+    }
+}
+
+exports.postAddExpense = async (req, res, next) => {
+    let t;
+    try {
+        t = await sequelize.transaction();
+        const expenseCreateResponse = await Expenses.create({
+            amount: parseInt(req.body.amount),
+            description: req.body.description,
+            category: req.body.category,
             userId: req.user.id
+        }, { transaction: t });
+        const updatedAmount = req.user.totalAmount + parseInt(req.body.amount);
+        const userUpdatedResponse = await User.update({ totalAmount: updatedAmount }, { where: { id: req.user.id }, transaction: t });
+        await t.commit();
+        sendResBlock(res, expenseCreateResponse, 'Expense added successfully!');
+    } catch (err) {
+        await t.rollback();
+        catchBlock(res, err, 'Expense could not be added');
+    }
+}
+
+exports.putUpdateExpense = async (req, res, next) => {
+    const amount = parseInt(req.body.amount);
+    let t;
+    try {
+        t = await sequelize.transaction();
+        const expenseResponse = await Expenses.findOne({ where: { id: req.params.id, userId: req.user.id } }, { transaction: t });
+        if (expenseResponse.amount != amount) {
+            let updatedAmount;
+            if (expenseResponse.amount < amount) {
+                updatedAmount = req.user.totalAmount + (amount - expenseResponse.amount);
+            } else {
+                updatedAmount = req.user.totalAmount - (expenseResponse.amount - amount);
+            }
+            const updatedUserResponse = await User.update({ totalAmount: updatedAmount }, { where: { id: req.user.id }, transaction: t });
         }
-    })
-        .then(response => res.json(response))
-        .catch(err => console.log(err));
+        const updatedExpenseResponse = await expenseResponse.update({
+            amount: amount,
+            description: req.body.description,
+            category: req.body.category
+        }, { transaction: t });
+
+        await t.commit()
+        sendResBlock(res, updatedExpenseResponse, 'Expense updated successfully!')
+    } catch (err) {
+        await t.rollback();
+        catchBlock(res, err, 'Expense could not be updated');
+    }
+}
+
+exports.deleteExpense = async (req, res, next) => {
+    let t;
+    try {
+        t = await sequelize.transaction();
+        const expenseResponse = await Expenses.findOne({ where: { id: req.params.id, userId: req.user.id } }, { transaction: t });
+        const updatedAmount = req.user.totalAmount - expenseResponse.amount;
+        expenseResponse.destroy();
+        const updatedUserResponse = await User.update({ totalAmount: updatedAmount }, { where: { id: req.user.id }, transaction: t });
+        await t.commit()
+        sendResBlock(res, expenseResponse, 'Expense deleted successfully!');
+    }
+    catch (err) {
+        await t.rollback();
+        catchBlock(res, err, 'Expense could not be deleted');
+    }
 }

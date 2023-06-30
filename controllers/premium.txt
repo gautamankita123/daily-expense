@@ -1,0 +1,11 @@
+User.findAll({
+            attributes: ['id', 'name', [sequelize.fn('sum', sequelize.col('amount')), 'total_cost']],
+            include: [
+                {
+                    model: Expenses,
+                    attributes: []
+                }
+            ],
+            group: ['user.id'],
+            order: [['total_cost', 'DESC']]
+        });

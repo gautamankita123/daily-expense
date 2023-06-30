@@ -33,7 +33,7 @@ async function getExpenses() {
     if (token) {
         try {
             const response = await axios.get(`http://localhost:3000/expenses`, { headers: { 'Authorization': token } });
-            response.data.forEach(expense => {
+            response.data.response.forEach(expense => {
                 generateHTML(expense.id, expense.amount, expense.description, expense.category);
             })
         } catch (error) {
@@ -64,7 +64,7 @@ async function addExpense(e) {
             if (!id && expenseAmount.value && expenseInfo.value && expenseCategory.value) {
                 try {
                     const response = await axios.post("http://localhost:3000/expenses", obj, { headers: { 'Authorization': token } });
-                    generateHTML(response.data.id, response.data.amount, response.data.description, response.data.category);
+                    generateHTML(response.data.response.id, response.data.response.amount, response.data.response.description, response.data.response.category);
                     setInputValues();
                 } catch (err) {
                     console.log(err);
@@ -104,8 +104,8 @@ async function editExpense(e) {
         if (token) {
             try {
                 const response = await axios.get(`http://localhost:3000/expenses/${id}`, { headers: { 'Authorization': token } });
-                document.getElementById('expense-id').value = response.data.id;
-                setInputValues(response.data.amount, response.data.description, response.data.category);
+                document.getElementById('expense-id').value = response.data.response.id;
+                setInputValues(response.data.response.amount, response.data.response.description, response.data.response.category);
             } catch (e) {
                 console.log(e);
             }
@@ -118,10 +118,10 @@ async function updateLeaderboard(e) {
     try {
         const response = await axios.get("http://localhost:3000/premium/showleaderboard");
         const leaderBoardList = document.querySelector('.leaderboard-list');
-        console.log(response.data)
+        leaderBoardList.innerHTML = '';
         response.data.forEach(userDetail => {
             let output = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Name - ${userDetail.name} Total Expense - ${userDetail.total_cost} Rs</span>
+                        <span>Name - ${userDetail.name} Total Expense - ${userDetail.totalAmount} Rs</span>
                     </li>`;
             leaderBoardList.innerHTML += output;
         })
