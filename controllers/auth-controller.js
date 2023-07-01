@@ -1,7 +1,12 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Sib = require('sib-api-v3-sdk');
+// const Sib = require('sib-api-v3-sdk');
+const { v4: uuidv4 } = require('uuid');
+const ForgotPasswordRequest = require('../models/reset-password');
+const sgMail = require('@sendgrid/mail');
+const { sendResBlock } = require('../util/helper');
+sgMail.setApiKey('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');
 
 
 // exports.getUser = (req, res, next) => {
@@ -77,40 +82,87 @@ exports.postLoginUser = async (req, res, next) => {
 exports.postForgotPassword = async (req, res, next) => {
     const email = req.body.email;
     try {
-        const user = User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({
                 error: 'User does not exist'
             });
         }
+        console.log('working');
+        const forgotPassowordResponse = await ForgotPasswordRequest.create({ id: uuidv4(), isActive: true, userId: user.id });
+        console.log('wokring', forgotPassowordResponse);
 
-        const client = Sib.ApiClient.instance;
-        const apiKey = client.authentications['api-key'];
-        apiKey.apiKey = "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";
-
-        const transEmailApi = new Sib.TransactionalEmailsApi();
-
-        const sender = {
-            email: 'ankitsharma751997@gmail.com'
-        }
-
-        const receivers = [
-            {
-                email: 'ankitsharma76543@gmail.com'
-            }
-        ]
-        const emailResponse = await transEmailApi.sendTransacEmail({
-            sender: sender,
-            to: receivers,
-            subject: 'Reset Password',
-            textContent: 'Please click the link below to reset your password'
-        });
-        // res.status(200).json({
-        //     message: "Password reset successful",
-        //     token: token
-        // });
-        console.log(emailResponse);
+        const msg = {
+            to: 'ankitsharma76543@gmail.com',
+            from: 'ankitsharma751997@gmail.com', // Use the email address or domain you verified above
+            subject: 'Reset Password Link',
+            html: `<h2>Click below link to reset your password</h2><a href="http://localhost:3000/password/resetpassword/${forgotPassowordResponse.id}">http://localhost:3000/password/resetpassword/${forgotPassowordResponse.id}</a></strong>`
+        };
+        const emailResponse = await sgMail.send(msg);
+        sendResBlock(res, emailResponse, 'Email sent successfully');
     } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            error: err
+        });
+    }
+}
+
+exports.getResetPasswordForm = async (req, res, next) => {
+    const id = req.params.resetId;
+    try {
+        const forgotPassowordResponse = await ForgotPasswordRequest.findOne({ where: { id: id } });
+        if (!forgotPassowordResponse) {
+            return res.status(404).json({
+                error: 'Invalid Request'
+            });
+        }
+        if (forgotPassowordResponse.isActive) {
+            // forgotPassowordResponse.update({ isActive: false });
+            res.status(200).send(`<html>
+                                    <script>
+                                        function formsubmitted(e){
+                                            e.preventDefault();
+                                            console.log('called')
+                                        }
+                                    </script>
+                                    <form action="/password/updatepassword/${id}" method="get">
+                                        <label for="newpassword">Enter New password</label>
+                                        <input name="newpassword" type="password" required></input>
+                                        <button>reset password</button>
+                                    </form>
+                                </html>`
+            )
+            return res.end()
+        }
+        return res.send('<h1>Not Valid Request</h1>');
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            error: err
+        });
+    }
+}
+
+exports.updatePassword = async (req, res, next) => {
+    try {
+        const { newpassword } = req.query;
+        const updateId = req.params.updateId;
+        const forgotPassowordResponse = await ForgotPasswordRequest.findOne({ where: { id: updateId } });
+        const user = await User.findOne({ where: { id: forgotPassowordResponse.userId } });
+        if (user) {
+            const hashedPassword = await bcrypt.hash(newpassword, 12);
+            user.password = hashedPassword;
+            user.save();
+            forgotPassowordResponse.update({ isActive: false });
+            res.status(200).redirect('http://localhost:3000/login.html');
+        } else {
+            return res.status(404).json({
+                error: 'User does not exist'
+            });
+        }
+    } catch (err) {
+        console.log(err);
         return res.status(500).json({
             error: err
         });

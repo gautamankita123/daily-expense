@@ -4,7 +4,7 @@ const authController = require('../controllers/auth-controller');
 const authMiddleware = require('../middleware/auth-middleware');
 
 // router.get('/expenses', expensesController.getAllExpenses);
-0
+
 // router.get('/', expensesController.getAllExpenses);
 
 // router.get('/expenses/:id', expensesController.getOneExpense);
@@ -15,6 +15,10 @@ router.post('/user/signup', authController.postAddUser);
 router.post('/user/login', authController.postLoginUser);
 
 router.post('/password/forgotpassword', authController.postForgotPassword);
+
+router.get('/password/resetpassword/:resetId', authController.getResetPasswordForm);
+
+router.get('/password/updatepassword/:updateId', authController.updatePassword);
 
 // router.put('/expenses/:id', expensesController.putUpdateExpense);
 

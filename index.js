@@ -10,6 +10,7 @@ const sequelize = require('./util/database');
 const User = require('./models/user');
 const Expenses = require('./models/expense');
 const Order = require('./models/order');
+const ForgotPasswordRequest = require('./models/reset-password');
 
 const app = express()
 
@@ -28,6 +29,8 @@ User.hasMany(Expenses);
 Expenses.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Order);
 Order.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(ForgotPasswordRequest);
+ForgotPasswordRequest.belongsTo(User);
 
 sequelize
     .sync()
