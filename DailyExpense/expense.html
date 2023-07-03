@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login page</title>
+    <link rel="stylesheet" href="expense.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <button class="primeBtn" id="premium">buy premium</button>
+    <div id="primeUser">
+        <button class="primeBtn" id="leadboard">show leadBoard</button>
+    </div>
+    <ul id="board">
+    </ul>
+
+    <div class="conaitaner">
+
+        <form class='form' id="submitForm">
+            <input type="text" id="description" placeholder="description" required>
+            <input type="number" id="price" placeholder="price" required>
+            <input type="text" id="category" placeholder="category" required>
+            <button class="btn" id="exepenseBtn" type="submit">add expense</button>
+        </form>
+
+        <form class='form' id="editForm">
+            <input type="text" id="newdescription" placeholder="newdescription" required>
+            <input type="number" id="newprice" placeholder="newprice" required>
+            <input type="text" id="newcategory" placeholder="newcategory" required>
+            <button class="btn" id="updateBtn" type="update">update expense</button>
+        </form>
+        <table id="tableItems" class="table">
+            <th>description</th>
+            <th>price</th>
+            <th>category</th>
+            <th>button</th>
+            </tr>
+            <td class="withDesc">fgh</td>
+            <td class="withPrice">$ghj</td>
+            <td class="withcat">zxc</td>
+            <td><button class="Btn1">delete</button>
+
+            </td>
+        </table>
+
+    </div>
+    <script src="expense.js"></script>
+</body>
+
+</html>
