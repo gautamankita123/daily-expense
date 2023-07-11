@@ -1,42 +1,41 @@
-const express = require('express');
-const bodyperser = require('body-parser');
+const express = require('express')
+const bodyParser = require('body-parser');
 const cors = require('cors');
-
+const path = require('path');
+const authRoutes = require('./routes/authRoutes');
+const expenseRoutes = require('./routes/expensesRoutes');
+const purchaseRoutes = require('./routes/purchase');
+const premiumRoutes = require('./routes/premiumRoutes');
 const sequelize = require('./util/database');
-let router = require('./routers/router.js');
-let expence = require('./routers/expense.js');
-let prime = require('./routers/purchase.js');
-let primeUser = require('./routers/primeUser.js')
-const forgetPassword = require('./routers/forgetPassword.js')
+const User = require('./models/user');
+const Expenses = require('./models/expense');
+const Order = require('./models/order');
+const ForgotPasswordRequest = require('./models/reset-password');
 
-let Expense = require('./models/expense.js');
-let User = require('./models/model.js');
-let order = require('./models/order.js');
-const Order = require('./models/order.js');
+const app = express()
 
-const app = express();
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cors());
-app.use(bodyperser.json({ extended: false }))
 
+app.use(bodyParser.json({ extended: false }));
 
-app.use('/user', router);
-app.use('/expense', expence);
-app.use('/primemember', prime);
-app.use('/prime', primeUser);
-app.use('/password', forgetPassword);
+app.use(authRoutes);
+app.use(expenseRoutes);
+app.use(purchaseRoutes);
+app.use(premiumRoutes);
 
-User.hasMany(Expense);
-Expense.belongsTo(User);
-
+User.hasMany(Expenses);
+Expenses.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Order);
-order.belongsTo(User);
-
-
-
+Order.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(ForgotPasswordRequest);
+ForgotPasswordRequest.belongsTo(User);
 
 sequelize
     //.sync({ force: true })
     .sync()
-    .catch(err => console.log(err))
-
-app.listen(4000) 
+    .then(() => {
+        app.listen(3000)
+    })
+    .catch(err => console.error(err));
