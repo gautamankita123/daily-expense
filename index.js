@@ -1,3 +1,5 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -20,7 +22,7 @@ app.use(cors());
 
 app.use(bodyParser.json({ extended: false }));
 
-app.use(authRoutes);
+app.use("/auth", authRoutes);
 app.use(expenseRoutes);
 app.use(purchaseRoutes);
 app.use(premiumRoutes);
@@ -33,9 +35,9 @@ User.hasMany(ForgotPasswordRequest);
 ForgotPasswordRequest.belongsTo(User);
 
 sequelize
-    //.sync({ force: true })
-    .sync()
+    .sync({ force: true })
+    //.sync()
     .then(() => {
-        app.listen(3000)
+        app.listen(process.env.PORT)
     })
     .catch(err => console.error(err));

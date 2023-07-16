@@ -1,3 +1,4 @@
+
 exports.catchBlock = (res, err, msg = '') => {
     res.status(401).json({
         message: msg,

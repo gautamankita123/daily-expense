@@ -3,11 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 // const Sib = require('sib-api-v3-sdk');
 const { v4: uuidv4 } = require('uuid');
-const ForgotPassw
-ordRequest = require('../models/reset-password');
+const ForgotPasswordRequest = require('../models/reset-password');
 const sgMail = require('@sendgrid/mail');
 const { sendResBlock } = require('../util/helpers');
-sgMail.setApiKey('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');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 
 // exports.getUser = (req, res, next) => {
@@ -18,6 +17,7 @@ exports.postAddUser = async (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
+    console.log(name, email, password);
     try {
         const user = await User.findOne({ where: { email: email } });
         if (user) {
@@ -64,7 +64,7 @@ exports.postLoginUser = async (req, res, next) => {
                 id: user.id,
                 name: user.name
             },
-            'KhulKeZeeLoZara'
+            process.env.JWT_SECRET_KEY,
         );
         res.status(200).json({
             message: "Login successful",
