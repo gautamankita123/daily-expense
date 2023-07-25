@@ -14,7 +14,7 @@ async function userSignup(e) {
     if (matchPassword(password.value, confirmPassword.value)) {
         try {
             if (name.value && email.value && password.value) {
-                const response = await axios.post('http://localhost:3000/auth/user/signup', { "name": name.value, "email": email.value, "password": password.value });
+                const response = await axios.post('http://localhost:3000/user/signup', { "name": name.value, "email": email.value, "password": password.value });
                 console.log(response.data);
                 alert('User signed up successfully');
                 window.location.href = 'http://localhost:3000/login.html';

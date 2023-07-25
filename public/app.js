@@ -172,14 +172,17 @@ async function addBuyPremium(e) {
 
 // Helper functions
 function generateHTML(id, am, ds, ca) {
-    let output = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>${am} - ${ds} - ${ca}</span>
-                        <div>
-                            <a class="edit btn btn-primary" id="${id}">Edit</a>
-                            <a class="delete btn btn-danger" id="${id}">Delete</a>
-                        </div>
-                    </li>`;
-    expenseList.innerHTML += output;
+    let output = `<tr>
+    <th scope="row">${ds}</th>
+    <td>${ca}</td>
+    <td>${am}</td>
+    <td>
+        <button type="button" id="${id}" class="btn small edit">Edit</button>
+        <button type="button" id="${id}" class="btn small delete">Delete</button>
+    </td>
+</tr>`;
+    let t = document.getElementById('tbody');
+    t.innerHTML += output;
 }
 
 function setInputValues(a = '', d = '', c = '') {
