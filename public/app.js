@@ -29,10 +29,12 @@ async function getExpenses() {
         document.querySelector('.leaderboard').classList.add('d-none');
     }
     const token = localStorage.getItem('token');
+    console.log(token);
     document.querySelector('.logged-user').textContent = localStorage.getItem('name');
     if (token) {
         try {
             const response = await axios.get(`http://localhost:3000/expenses`, { headers: { 'Authorization': token } });
+            console.log(response);
             response.data.response.forEach(expense => {
                 generateHTML(expense.id, expense.amount, expense.description, expense.category);
             })
@@ -172,17 +174,14 @@ async function addBuyPremium(e) {
 
 // Helper functions
 function generateHTML(id, am, ds, ca) {
-    let output = `<tr>
-    <th scope="row">${ds}</th>
-    <td>${ca}</td>
-    <td>${am}</td>
-    <td>
-        <button type="button" id="${id}" class="btn small edit">Edit</button>
-        <button type="button" id="${id}" class="btn small delete">Delete</button>
-    </td>
-</tr>`;
-    let t = document.getElementById('tbody');
-    t.innerHTML += output;
+    let output = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>${am} - ${ds} - ${ca}</span>
+                        <div>
+                            <a class="edit btn btn-primary" id="${id}">Edit</a>
+                            <a class="delete btn btn-danger" id="${id}">Delete</a>
+                        </div>
+                    </li>`;
+    expenseList.innerHTML += output;
 }
 
 function setInputValues(a = '', d = '', c = '') {
