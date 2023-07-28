@@ -1,13 +1,12 @@
+const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 // const Sib = require('sib-api-v3-sdk');
 const { v4: uuidv4 } = require('uuid');
+const ForgotPasswordRequest = require('../models/reset-password');
 const sgMail = require('@sendgrid/mail');
 const { sendResBlock } = require('../util/helpers');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-
-const {ForgotPasswordRequest,User} = require('../models/database');
 
 
 // exports.getUser = (req, res, next) => {
@@ -18,7 +17,6 @@ exports.postAddUser = async (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
-    console.log(name, email, password);
     try {
         const user = await User.findOne({ where: { email: email } });
         if (user) {
@@ -50,13 +48,13 @@ exports.postLoginUser = async (req, res, next) => {
     try {
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-            return res.status(405).json({
+            return res.status(404).json({
                 error: 'User does not exist'
             });
         }
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(404).json({
+            return res.status(401).json({
                 error: 'Invalid password'
             });
         }
@@ -95,7 +93,7 @@ exports.postForgotPassword = async (req, res, next) => {
         console.log('wokring', forgotPassowordResponse);
 
         const msg = {
-            to: 'gautamanku06@gmail.com',
+            to: 'gautamanku60@gmail.com',
             from: 'ankitagautam6263@gmail.com', // Use the email address or domain you verified above
             subject: 'Reset Password Link',
             html: `<h2>Click below link to reset your password</h2><a href="http://localhost:3000/password/resetpassword/${forgotPassowordResponse.id}">http://localhost:3000/password/resetpassword/${forgotPassowordResponse.id}</a></strong>`

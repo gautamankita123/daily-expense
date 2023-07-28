@@ -1,9 +1,8 @@
+const Expenses = require('../models/expense');
+const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-const sequelize = require('../models/sequelize');
+const sequelize = require('../util/database');
 const { catchBlock, sendResBlock } = require('../util/helpers');
-
-const {User,Expenses} = require('../models/database');
-
 
 exports.getAllExpenses = async (req, res, next) => {
     try {
