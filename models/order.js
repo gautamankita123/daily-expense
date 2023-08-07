@@ -1,17 +1,19 @@
-const Sequelize = require('sequelize');
+const sequelize = require("../database/mysql");
+const Sequelize = require("sequelize");
 
-const sequelize = require('../util/database');
-
-const Order = sequelize.define('order', {
+const Order = sequelize.define("order", {
     id: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        allowNull: false
     },
-    paymentId: Sequelize.STRING,
-    orderId: Sequelize.STRING,
+    paymentid: Sequelize.STRING,
+    orderid: Sequelize.STRING,
     status: Sequelize.STRING,
-})
+    userId: {
+        type: Sequelize.INTEGER,
+    },
+});
 
 module.exports = Order;
