@@ -12,7 +12,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgb(130, 106, 251);
+    background: #3498db;
+    /* Updated background color */
     padding: 20px;
 }
 
@@ -28,7 +29,8 @@ body {
 
 .container header {
     text-align: center;
-    color: black;
+    color: #333;
+    /* Updated header text color */
     font-size: 1.5rem;
     font-weight: 500;
 }
@@ -43,7 +45,8 @@ body {
 }
 
 .input-box label {
-    color: rgb(1, 18, 19);
+    color: #555;
+    /* Updated label text color */
 }
 
 .form .input-box input {
@@ -52,9 +55,11 @@ body {
     width: 100%;
     font-size: 1rem;
     margin-top: 8px;
-    color: rgb(18, 14, 22);
+    color: #222;
+    /* Updated input text color */
     outline: none;
-    border: 1px solid rgb(214, 201, 201);
+    border: 1px solid #ccc;
+    /* Updated input border color */
     border-radius: 6px;
     padding: 0 15px;
 }
@@ -62,16 +67,19 @@ body {
 .form button {
     height: 55px;
     width: 100%;
-    color: black;
+    color: white;
+    /* Updated button text color */
     font-size: 1rem;
     border: none;
     margin-top: 30px;
     border-radius: 6px;
     font-weight: 400;
     cursor: pointer;
-    background-color: rgb(130, 106, 251);
+    background-color: #e74c3c;
+    /* Updated button background color */
 }
 
 .form button:hover {
-    background-color: rgb(9, 17, 241);
+    background-color: #c0392b;
+    /* Updated button hover background color */
 }

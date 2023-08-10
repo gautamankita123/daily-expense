@@ -6,6 +6,8 @@ expenseList.addEventListener("click", deleteExpense);
 leaderboardBtn.addEventListener('click', updateLeaderboard);
 generateReportBtn.addEventListener('click', generateReport);
 
+window.addEventListener('load', showExpense());
+
 const expensesPreferenceDropdown = document.getElementById('expensesPreference');
 
 
@@ -41,7 +43,8 @@ function generateReport(e) {
         })
         .then((response) => {
             if (response.status === 201) {
-
+                //the bcakend is essentially sending a download link
+                //  which if we open in browser, the file would download
                 var a = document.createElement("a");
                 a.href = response.data.fileUrl;
                 a.download = "myexpense.csv";
@@ -111,6 +114,8 @@ async function savetolocalstorage(e) {
         await axios.post("http://localhost:3000/expense", obj, {
             headers: { Authorization: token },
         });
+        e.target.reset();
+
         showOnScreen(obj);
     } catch (err) {
         console.log(err);
@@ -183,7 +188,15 @@ async function deleteExpense(e) {
     }
 }
 
+function saveExpensePreference(expensePreference) {
+    localStorage.setItem('expensesPreference', expensePreference);
+    showExpense()
+}
 
+expensesPreferenceDropdown.addEventListener('change', function () {
+    const selectedValue = expensesPreferenceDropdown.value;
+    saveExpensePreference(selectedValue);
+});
 
 // show leaderboard button and hide buyPremium button on screen
 // show expenses on screen
@@ -191,11 +204,13 @@ async function deleteExpense(e) {
 async function showExpense(page) {
     const token = localStorage.getItem("token");
 
-    const pagesize = 10;
+    const expensePreference = localStorage.getItem('expensesPreference');
+
+    const pagesize = expensePreference ? parseInt(expensePreference) : 5;
     if (!page || page < 1) {
         page = 1;
     }
-    // const page =1;
+
     await axios.get(`http://localhost:3000/get_expenses?page=${page}&pagesize=${pagesize}`, {
         headers: { Authorization: token },
     })
@@ -235,9 +250,6 @@ window.addEventListener("DOMContentLoaded", (req, res) => {
             });
 
         // commit se h
-        const pagesize = 10;
-        const page = 1;
-
     } catch (err) {
         res.status(500).json({ err: err });
     }
