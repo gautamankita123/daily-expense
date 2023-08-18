@@ -34,8 +34,8 @@
             <div class="card mx-2" style="width: 70%;height: 80vh;">
                 <div class="card-body">
                     <div class="text-center">
-                        <h4>Custom Expense Tracker</h4>
-                        <p>You can add or edit your expense</p>
+                        <h4>Add Expenses </h4>
+                        <!-- <p>You can add or edit your expense</p> -->
                         <hr>
                     </div>
                     <form class="row g-3 d-flex flex-column justify-content-between align-items-between"
@@ -87,8 +87,22 @@
                             </table>
                         </ul>
                 </div>
-                <div id="pagination">
-                </div>
+                <ul class="items2 my-4" id="items2">
+                    <label for="expensesPreference">Select the number of expenses to display:</label>
+                    <select id="expensesPreference">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="5">5</option>
+                        <option value="8">8</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                    </select>
+                    <!-- <ul class="items my-4" id="items"></ul> -->
+                    <div id="pagination">
+
+                    </div>
             </div>
             <div class="card leaderboard d-none" style="width: 50%;height: 80vh;">
                 <div class="card-header d-flex justify-content-around">
@@ -106,6 +120,8 @@
                         </thead>
                         <tbody id="tbodyleader">
                             <tr>
+                                <!-- <th scope="row">1</th>
+                                <td>indresh</td> -->
                             </tr>
 
                         </tbody>
@@ -114,6 +130,7 @@
                 </div>
             </div>
         </div>
+
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
         integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
