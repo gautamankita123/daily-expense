@@ -6,7 +6,7 @@ expenseList.addEventListener("click", deleteExpense);
 leaderboardBtn.addEventListener('click', updateLeaderboard);
 generateReportBtn.addEventListener('click', generateReport);
 
-window.addEventListener('load', showExpense());
+window.addEventListener('load', showExpense(1));
 
 const expensesPreferenceDropdown = document.getElementById('expensesPreference');
 
@@ -23,12 +23,12 @@ function showPagination({
     let buttonsHTML = []; // Create an array to store the pagination buttons
 
     if (hasPreviousPage) {
-        console.log("hasPreviousPage")
+        // console.log("hasPreviousPage")
         buttonsHTML.push(`<button class="btn btn-primary" onclick="showExpense(${previousPage})">Previous Page</button>`);
     }
 
     if (hasNextPage) {
-        console.log("hasNextPage")
+        // console.log("hasNextPage")
         buttonsHTML.push(`<button class="btn btn-primary" onclick="showExpense(${nextPage})">Next Page</button>`);
     }
 
@@ -114,8 +114,8 @@ async function savetolocalstorage(e) {
         await axios.post("http://localhost:3000/expense", obj, {
             headers: { Authorization: token },
         });
-        e.target.reset();
 
+        e.target.reset();
         showOnScreen(obj);
     } catch (err) {
         console.log(err);
@@ -152,8 +152,6 @@ async function updateLeaderboard(e) {
             "http://localhost:3000/leaderboard",
             { headers: { Authorization: token } }
         );
-        // const leaderBoardList = document.querySelector('.leaderboard-list');
-        // leaderBoardList.innerHTML = '';
 
         response.data.forEach(userDetail => {
             let output = `<tr>
@@ -202,28 +200,34 @@ expensesPreferenceDropdown.addEventListener('change', function () {
 // show expenses on screen
 
 async function showExpense(page) {
+    tbody.innerHTML = "";
+
     const token = localStorage.getItem("token");
 
     const expensePreference = localStorage.getItem('expensesPreference');
 
-    const pagesize = expensePreference ? parseInt(expensePreference) : 5;
+    const pagesize = expensePreference ? parseInt(expensePreference) : 10;
     if (!page || page < 1) {
         page = 1;
     }
-
-    await axios.get(`http://localhost:3000/get_expenses?page=${page}&pagesize=${pagesize}`, {
-        headers: { Authorization: token },
-    })
-        .then((result) => {
-            const { currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage } = result.data;
-            for (let i = 0; i < result.data.expenses.length; i++) {
-                showOnScreen(result.data.expenses[i]);
-            }
-            showPagination({ currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage })
+    try {
+        await axios.get(`http://localhost:3000/get_expenses?page=${page}&pagesize=${pagesize}`, {
+            headers: { Authorization: token },
         })
-        .catch((err) => {
-            throw new Error(err);
-        });
+            .then((result) => {
+                const { currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage } = result.data;
+                for (let i = 0; i < result.data.expenses.length; i++) {
+                    showOnScreen(result.data.expenses[i]);
+                }
+                showPagination({ currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage })
+            })
+            .catch((err) => {
+                throw new Error(err);
+            });
+    } catch (err) {
+        console.log(err);
+    }
+
 }
 
 window.addEventListener("DOMContentLoaded", (req, res) => {
